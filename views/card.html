@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Card</title>
+    <link rel="stylesheet" href="/style2.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div id="card" class="card">
+        <h1>{{ name }}</h1>
+        <p><strong>Email:</strong> {{ email }}</p>
+        <p><strong>Phone:</strong> {{ phone }}</p>
+        {{ github }} {{ linkedin }}
+        <div class="qr-container">{{ qrCode }}</div>
+        <span id="custom-code" style="display: none">{{ code }}</span>
+      </div>
+
+      <div class="btn">
+        <a href="/" class="return">Go to home page</a>
+        <button id="download-btn">Download Card</button>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("download-btn")
+        .addEventListener("click", function () {
+          const cards = document.getElementById("card");
+          html2canvas(cards).then((canvas) => {
+            const link = document.createElement("a");
+            link.download = "contact-card.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+          });
+        });
+    </script>
+  </body>
+</html>

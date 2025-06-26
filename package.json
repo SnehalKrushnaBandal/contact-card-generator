@@ -1,0 +1,19 @@
+{
+  "name": "contact-card-generator",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "node --watch app.js",
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "html2canvas": "^1.4.1",
+    "qrcode": "^1.5.4"
+  }
+}

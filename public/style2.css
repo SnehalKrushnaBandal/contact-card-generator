@@ -1,0 +1,123 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f7fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+}
+
+.card {
+  position: relative;
+  background-color: #071c2c;
+  padding: 30px 40px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  top: 0%;
+  background-color: #009dff;
+  height: 10px;
+  border-radius: 10px 10px 0 0;
+  width: 100%;
+  transform: translateX(-50%);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  bottom: 0%;
+  background-color: #009dff;
+  height: 10px;
+  border-radius: 0 0 10px 10px;
+  width: 100%;
+  transform: translateX(-50%);
+}
+
+.card h1 {
+  position: relative;
+  margin-bottom: 20px;
+  color: #f9b43a;
+  text-align: start;
+}
+
+.card h1::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  background-color: #009dff;
+  height: 2px;
+  bottom: 0;
+  /* width: 260px; */
+  width: 100%;
+  transform: translateX(-50%);
+}
+
+.card p {
+  font-size: 16px;
+  margin: 10px 0;
+  text-align: start;
+  color: #4aff60;
+}
+
+.card p strong {
+  color: #ffffff;
+}
+
+.card a {
+  color: #4aff60;
+  text-decoration: none;
+}
+
+.card a:hover {
+  text-decoration: underline;
+}
+
+.card .qr-img {
+  position: absolute;
+  height: 100px;
+  width: 100px;
+  right: 20px;
+  top: 20px;
+  border: 2px solid #f9b43a;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.btn {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.return,
+#download-btn {
+  margin: 5px;
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #009dff;
+  text-decoration: none;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
