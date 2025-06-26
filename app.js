@@ -1,5 +1,5 @@
 import express from "express";
-import { PORT } from "../env.js";
+import { PORT } from "./env.js";
 import { readFile, writeFile } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
