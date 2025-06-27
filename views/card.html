@@ -15,7 +15,8 @@
         <p><strong>Email:</strong> {{ email }}</p>
         <p><strong>Phone:</strong> {{ phone }}</p>
         {{ github }} {{ linkedin }}
-        <img src="{{ qrImage }}" class="qr-img" id="qr-download-trigger" alt="QR Code">
+        {{ qrCode }}
+        <!-- <img src="{{ qrImage }}" class="qr-img" id="qr-download-trigger" alt="QR Code"> -->
         <div style="display: none;" id="customCode" >{{ code }}</div>
       </div>
 
@@ -40,7 +41,7 @@
         });
     </script>
 
-    <script>
+    <!-- <script>
   document.getElementById("qr-download-trigger").addEventListener("click", () => {
     const card = document.getElementById("card");
     const customCode = document.getElementById("customCode").innerText;
@@ -53,6 +54,6 @@
       link.click();
     });
   });
-</script>
+</script> -->
   </body>
 </html>
