@@ -105,7 +105,8 @@ app.get("/card/:code", async (req, res) => {
     }
 
     // to add QR code
-    const cardUrl = `http://localhost:${PORT}/card/${code}`;
+    // const cardUrl = `http://localhost:${PORT}/card/${code}`;
+    const cardUrl = `https://contact-card-generator.onrender.com/`; 
     const qrImageData = await QRCode.toDataURL(cardUrl);
 
     // Read HTML template
