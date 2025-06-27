@@ -4,6 +4,7 @@ import { readFile, writeFile } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import QRCode from "qrcode";
+import os from "os";
 
 const app = express();
 const cardsFilePath = path.join(import.meta.dirname, "data", "card_info.json");
@@ -108,7 +109,23 @@ app.get("/card/:code", async (req, res) => {
     }
 
     // to add QR code
-    const cardUrl = `http://localhost:${PORT}/card/${code}`;
+
+function getLocalIP() {
+  const interfaces = os.networkInterfaces();
+  for (const name in interfaces) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === "IPv4" && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return "localhost";
+}
+
+const localIP = getLocalIP();
+const cardUrl = `http://${localIP}:${PORT}/card/${code}`;
+
+    // const cardUrl = `http://localhost:${PORT}/card/${code}`;
     const qrImageData = await QRCode.toDataURL(cardUrl);
 
     // Read HTML template
@@ -138,7 +155,7 @@ app.get("/card/:code", async (req, res) => {
       )
       .replace(
         "{{ qrCode }}",
-        `<a href="${qrImageData}" class"qr" download="${code}.png"><img src="${qrImageData}" class="qr-img" alt="QR Code" /></a>`
+        `<a href="${qrImageData}" class="qr" download="${code}.png"><img src="${qrImageData}" class="qr-img" alt="QR Code" /></a>`
       );
 
     res.send(content);
