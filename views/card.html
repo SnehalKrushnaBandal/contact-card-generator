@@ -15,7 +15,6 @@
         <p><strong>Email:</strong> {{ email }}</p>
         <p><strong>Phone:</strong> {{ phone }}</p>
         {{ github }} {{ linkedin }}
-        <!-- <div class="qr-container">{{ qrCode }}</div> -->
         <img src="{{ qrImage }}" class="qr-img" id="qr-download-trigger" alt="QR Code">
         <div style="display: none;" id="customCode" >{{ code }}</div>
       </div>
@@ -31,9 +30,10 @@
         .getElementById("download-btn")
         .addEventListener("click", function () {
           const cards = document.getElementById("card");
+    const customCode = document.getElementById("customCode").innerText;
           html2canvas(cards).then((canvas) => {
             const link = document.createElement("a");
-            link.download = "contact-card.png";
+            link.download = `${customCode}.png`;
             link.href = canvas.toDataURL("image/png");
             link.click();
           });

@@ -17,16 +17,13 @@ app.get("/", async (req, res) => {
     const indexFile = path.join(import.meta.dirname, "views", "index.html");
     res.sendFile(indexFile);
   } catch (error) {
-    // res.status(500).send("Internal server error");
          res.status(500).send(
         `
         <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
         <h1> Internal server error </h1>
         <a href="/"> <h2> Go to home page </h2> </a>
-        </div>
-        `
-      );
-  }
+        </div> `
+      );}
 });
 
 // get the user data
@@ -50,30 +47,22 @@ app.post("/", async (req, res) => {
         cards = {};
       } else {
         console.error("Error reading file:", err);
-        // return res.status(500).send("Could not read card file.");
         return res.status(500).send( `
         <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
         <h1> Could not read card file. </h1>
         <a href="/"> <h2> Go to home page </h2> </a>
-        </div>
-        `);
+        </div>`);
       }
     }
 
     // Check duplicate custom code
     if (cards[finalShortCode]) {
-      //   return res.status(400).send("Custom code already exists.");
-    //   return res.redirect("/?error=Custom code already exists");
-    //   res.status(400).sendFile(path.join(import.meta.dirname, "views", "error.html"));
       res.status(400).send(
-        `
-        <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        `<div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
         <h1> Custom code already exists. </h1>
         <a href="/"> <h2> Go to home page </h2> </a>
-        </div>
-        `
+        </div>`
       );
-    
     }
 
     // Save new card
@@ -84,14 +73,11 @@ app.post("/", async (req, res) => {
     return res.redirect(`/card/${finalShortCode}`);
   } catch (error) {
     console.error("Server error:", error);
-    // return res.status(500).send("Internal server error");
     return res.status(500).send(
-          `
-        <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
+          `<div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
         <h1> Internal server error </h1>
         <a href="/"> <h2> Go to home page </h2> </a>
-        </div>
-        `
+        </div> `
     );
   }
 });
@@ -119,16 +105,11 @@ app.get("/card/:code", async (req, res) => {
     }
 
     // to add QR code
-
     const cardUrl = `http://localhost:${PORT}/card/${code}`;
     const qrImageData = await QRCode.toDataURL(cardUrl);
 
     // Read HTML template
-    const cardTemplatePath = path.join(
-      import.meta.dirname,
-      "views",
-      "card.html"
-    );
+    const cardTemplatePath = path.join( import.meta.dirname, "views", "card.html");
     let content = await readFile(cardTemplatePath, "utf-8");
 
     // Replace placeholders in template
@@ -154,7 +135,6 @@ app.get("/card/:code", async (req, res) => {
     res.send(content);
   } catch (error) {
     console.error("Card display error:", error);
-    // res.status(500).send("Internal server error");
       res.status(500).send(
         `
         <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">

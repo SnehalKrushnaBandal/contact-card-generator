@@ -47,14 +47,6 @@
     "linkedin": "",
     "code": "SB"
   },
-  "skb": {
-    "name": "Snehal Bandal",
-    "email": "skbandal02@gmail.com",
-    "phone": "8591142309",
-    "github": "",
-    "linkedin": "",
-    "code": "skb"
-  },
   "sana": {
     "name": "Snehal Bandal",
     "email": "skbandal02@gmail.com",
@@ -182,5 +174,13 @@
     "github": "",
     "linkedin": "",
     "code": "snehal17"
+  },
+  "SnehalBandal": {
+    "name": "Snehal Bandal",
+    "email": "skbandal02@gmail.com",
+    "phone": "1234567890",
+    "github": "https://github.com/SnehalKrushnaBandal",
+    "linkedin": "https://www.linkedin.com/in/snehal-krushna-bandal-514592267/",
+    "code": "SnehalBandal"
   }
 }
