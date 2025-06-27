@@ -4,7 +4,6 @@ import { readFile, writeFile } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import QRCode from "qrcode";
-import os from "os";
 
 const app = express();
 const cardsFilePath = path.join(import.meta.dirname, "data", "card_info.json");
@@ -18,31 +17,17 @@ app.get("/", async (req, res) => {
     const indexFile = path.join(import.meta.dirname, "views", "index.html");
     res.sendFile(indexFile);
   } catch (error) {
-    res.status(500).send("Internal server error");
+    // res.status(500).send("Internal server error");
+         res.status(500).send(
+        `
+        <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h1> Internal server error </h1>
+        <a href="/"> <h2> Go to home page </h2> </a>
+        </div>
+        `
+      );
   }
 });
-
-// app.get("/", async (req, res) => {
-//   try {
-//     const indexFile = path.join(import.meta.dirname, "views", "index.html");
-//     let content = await readFile(indexFile, "utf-8");  // <== FIXED
-
-//     const { error, success } = req.query;
-
-//     if (error) {
-//       content = content.replace("{{ alert }}", `<p style="color:red;">${error}</p>`);
-//     } else if (success) {
-//       content = content.replace("{{ alert }}", `<p style="color:green;">${success}</p>`);
-//     } else {
-//       content = content.replace("{{ alert }}", "");
-//     }
-
-//     res.send(content);  // <== FIXED: now sending modified content
-//   } catch (error) {
-//     console.error("Error loading homepage:", error);
-//     res.status(500).send("Internal server error");
-//   }
-// });
 
 // get the user data
 app.post("/", async (req, res) => {
@@ -51,13 +36,7 @@ app.post("/", async (req, res) => {
     const finalShortCode = code || crypto.randomBytes(4).toString("hex");
 
     const newCard = {
-      name,
-      email,
-      phone,
-      github,
-      linkedin,
-      code: finalShortCode,
-    };
+      name, email, phone, github, linkedin, code: finalShortCode, };
 
     // Load existing cards
     let cards = {};
@@ -71,14 +50,30 @@ app.post("/", async (req, res) => {
         cards = {};
       } else {
         console.error("Error reading file:", err);
-        return res.status(500).send("Could not read card file.");
+        // return res.status(500).send("Could not read card file.");
+        return res.status(500).send( `
+        <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h1> Could not read card file. </h1>
+        <a href="/"> <h2> Go to home page </h2> </a>
+        </div>
+        `);
       }
     }
 
     // Check duplicate custom code
     if (cards[finalShortCode]) {
       //   return res.status(400).send("Custom code already exists.");
-      return res.redirect("/?error=Custom code already exists");
+    //   return res.redirect("/?error=Custom code already exists");
+    //   res.status(400).sendFile(path.join(import.meta.dirname, "views", "error.html"));
+      res.status(400).send(
+        `
+        <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h1> Custom code already exists. </h1>
+        <a href="/"> <h2> Go to home page </h2> </a>
+        </div>
+        `
+      );
+    
     }
 
     // Save new card
@@ -89,7 +84,15 @@ app.post("/", async (req, res) => {
     return res.redirect(`/card/${finalShortCode}`);
   } catch (error) {
     console.error("Server error:", error);
-    return res.status(500).send("Internal server error");
+    // return res.status(500).send("Internal server error");
+    return res.status(500).send(
+          `
+        <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h1> Internal server error </h1>
+        <a href="/"> <h2> Go to home page </h2> </a>
+        </div>
+        `
+    );
   }
 });
 
@@ -105,27 +108,19 @@ app.get("/card/:code", async (req, res) => {
     const card = cards[code];
 
     if (!card) {
-      return res.status(404).send("Card not found");
+      return res.status(404).send(
+        `
+        <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h1> Card not found </h1>
+        <a href="/"> <h2> Go to home page </h2> </a>
+        </div>
+        `
+      );
     }
 
     // to add QR code
 
-function getLocalIP() {
-  const interfaces = os.networkInterfaces();
-  for (const name in interfaces) {
-    for (const iface of interfaces[name]) {
-      if (iface.family === "IPv4" && !iface.internal) {
-        return iface.address;
-      }
-    }
-  }
-  return "localhost";
-}
-
-const localIP = getLocalIP();
-const cardUrl = `http://${localIP}:${PORT}/card/${code}`;
-
-    // const cardUrl = `http://localhost:${PORT}/card/${code}`;
+    const cardUrl = `http://localhost:${PORT}/card/${code}`;
     const qrImageData = await QRCode.toDataURL(cardUrl);
 
     // Read HTML template
@@ -141,6 +136,7 @@ const cardUrl = `http://${localIP}:${PORT}/card/${code}`;
       .replace("{{ name }}", card.name)
       .replace("{{ email }}", card.email)
       .replace("{{ phone }}", card.phone)
+      .replace("{{ code }}", card.code)
       .replace(
         "{{ github }}",
         card.github
@@ -153,15 +149,20 @@ const cardUrl = `http://${localIP}:${PORT}/card/${code}`;
           ? `<p><strong>LinkedIn:</strong> <a href="${card.linkedin}" target="_blank">${card.linkedin}</a></p>`
           : ""
       )
-      .replace(
-        "{{ qrCode }}",
-        `<a href="${qrImageData}" class="qr" download="${code}.png"><img src="${qrImageData}" class="qr-img" alt="QR Code" /></a>`
-      );
+      .replace("{{ qrImage }}", qrImageData);
 
     res.send(content);
   } catch (error) {
     console.error("Card display error:", error);
-    res.status(500).send("Internal server error");
+    // res.status(500).send("Internal server error");
+      res.status(500).send(
+        `
+        <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h1> Internal server error </h1>
+        <a href="/"> <h2> Go to home page </h2> </a>
+        </div>
+        `
+      );
   }
 });
 
