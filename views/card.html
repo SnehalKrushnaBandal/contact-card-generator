@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact Card</title>
     <link rel="stylesheet" href="/style2.css" />
-
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   </head>
   <body>
@@ -16,7 +15,6 @@
         <p><strong>Phone:</strong> {{ phone }}</p>
         {{ github }} {{ linkedin }}
         {{ qrCode }}
-        <!-- <img src="{{ qrImage }}" class="qr-img" id="qr-download-trigger" alt="QR Code"> -->
         <div style="display: none;" id="customCode" >{{ code }}</div>
       </div>
 
@@ -40,20 +38,5 @@
           });
         });
     </script>
-
-    <!-- <script>
-  document.getElementById("qr-download-trigger").addEventListener("click", () => {
-    const card = document.getElementById("card");
-    const customCode = document.getElementById("customCode").innerText;
-    html2canvas(card).then(canvas => {
-      const link = document.createElement("a");
-      // link.download = "contact-card.png";
-      link.download = `${customCode}.png`;
-
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    });
-  });
-</script> -->
   </body>
 </html>
