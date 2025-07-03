@@ -1,118 +1,87 @@
 import express from "express";
-import { PORT } from "./env.js";
-import { readFile, writeFile } from "fs/promises";
+import { readFile } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 import QRCode from "qrcode";
+import { fileURLToPath } from "url";
+
+import { client } from "./config/db_client.js";
+import { env } from "./config/env.js";
 
 const app = express();
-const cardsFilePath = path.join(import.meta.dirname, "data", "card_info.json");
 
+// Required for __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Middlewares
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 
-// send index.html file
+// MongoDB Setup
+const db = client.db(env.MONGODB_DB_NAME);
+const cardsCollection = db.collection("cardsCollection");
+
+// Helper: Get card by short code
+const loadCardByCode = async (code) => {
+  return await cardsCollection.findOne({ code });
+};
+
+// Helper: Save card
+const saveCard = async (card) => {
+  return await cardsCollection.insertOne(card);
+};
+
+// Route: Home (form)
 app.get("/", async (req, res) => {
   try {
-    const indexFile = path.join(import.meta.dirname, "views", "index.html");
+    const indexFile = path.join(__dirname, "views", "index.html");
     res.sendFile(indexFile);
   } catch (error) {
-         res.status(500).send(
-        `
-        <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <h1> Internal server error </h1>
-        <a href="/"> <h2> Go to home page </h2> </a>
-        </div> `
-      );}
+    console.error("Home load error:", error);
+    res.status(500).send(errorPage("Internal server error"));
+  }
 });
 
-// get the user data
+// Route: Form submit
 app.post("/", async (req, res) => {
   try {
     const { name, email, phone, github, linkedin, code } = req.body;
     const finalShortCode = code || crypto.randomBytes(4).toString("hex");
 
-    const newCard = {
-      name, email, phone, github, linkedin, code: finalShortCode, };
-
-    // Load existing cards
-    let cards = {};
-    try {
-      const CardData = await readFile(cardsFilePath, "utf-8");
-      cards = CardData.trim() === "" ? {} : JSON.parse(CardData);
-    } catch (err) {
-      console.error("FULL FILE READ ERROR:", err);
-      if (err.code === "ENOENT") {
-        await writeFile(cardsFilePath, JSON.stringify({}));
-        cards = {};
-      } else {
-        console.error("Error reading file:", err);
-        return res.status(500).send( `
-        <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <h1> Could not read card file. </h1>
-        <a href="/"> <h2> Go to home page </h2> </a>
-        </div>`);
-      }
+    // Check if code exists
+    const existing = await loadCardByCode(finalShortCode);
+    if (existing) {
+      return res.status(400).send(errorPage("Custom code already exists."));
     }
 
-    // Check duplicate custom code
-    if (cards[finalShortCode]) {
-      res.status(400).send(
-        `<div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <h1> Custom code already exists. </h1>
-        <a href="/"> <h2> Go to home page </h2> </a>
-        </div>`
-      );
-    }
+    const newCard = { name, email, phone, github, linkedin, code: finalShortCode };
+    await saveCard(newCard);
 
-    // Save new card
-    cards[finalShortCode] = newCard;
-    await writeFile(cardsFilePath, JSON.stringify(cards, null, 2));
-
-    console.log("Card Saved:", newCard);
-    return res.redirect(`/card/${finalShortCode}`);
+    console.log("Card saved:", newCard);
+    res.redirect(`/card/${finalShortCode}`);
   } catch (error) {
-    console.error("Server error:", error);
-    return res.status(500).send(
-          `<div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <h1> Internal server error </h1>
-        <a href="/"> <h2> Go to home page </h2> </a>
-        </div> `
-    );
+    console.error("Form submission error:", error);
+    res.status(500).send(errorPage("Internal server error"));
   }
 });
 
-// show from data in the card.html
+// Route: Card display
 app.get("/card/:code", async (req, res) => {
   try {
     const { code } = req.params;
-
-    // Read and parse saved cards
-    const cardData = await readFile(cardsFilePath, "utf-8");
-    const cards = cardData.trim() === "" ? {} : JSON.parse(cardData);
-
-    const card = cards[code];
+    const card = await loadCardByCode(code);
 
     if (!card) {
-      return res.status(404).send(
-        `
-        <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <h1> Card not found </h1>
-        <a href="/"> <h2> Go to home page </h2> </a>
-        </div>
-        `
-      );
+      return res.status(404).send(errorPage("Card not found"));
     }
 
-    // to add QR code
-    const cardUrl = `http://localhost:${PORT}/card/${code}`;
+    const cardUrl = `http://localhost:${env.PORT}/card/${code}`;
     const qrImageData = await QRCode.toDataURL(cardUrl);
 
-    // Read HTML template
-    const cardTemplatePath = path.join( import.meta.dirname, "views", "card.html");
+    const cardTemplatePath = path.join(__dirname, "views", "card.html");
     let content = await readFile(cardTemplatePath, "utf-8");
 
-    // Replace placeholders in template
     content = content
       .replace("{{ name }}", card.name)
       .replace("{{ email }}", card.email)
@@ -135,17 +104,21 @@ app.get("/card/:code", async (req, res) => {
     res.send(content);
   } catch (error) {
     console.error("Card display error:", error);
-      res.status(500).send(
-        `
-        <div style="width:100%; height:100%;  display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <h1> Internal server error </h1>
-        <a href="/"> <h2> Go to home page </h2> </a>
-        </div>
-        `
-      );
+    res.status(500).send(errorPage("Internal server error"));
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+// Helper: Reusable error page
+function errorPage(message) {
+  return `
+    <div style="width:100%; height:100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+      <h1>${message}</h1>
+      <a href="/"><h2>Go to Home Page</h2></a>
+    </div>
+  `;
+}
+
+// Start server
+app.listen(env.PORT, () => {
+  console.log(`Server is running on http://localhost:${env.PORT}`);
 });
