@@ -76,7 +76,12 @@ app.get("/card/:code", async (req, res) => {
       return res.status(404).send(errorPage("Card not found"));
     }
 
+<<<<<<< HEAD
     const cardUrl = `http://localhost:${env.PORT}/card/${code}`;
+=======
+    // to add QR code
+    const cardUrl = `http://localhost:${PORT}/card/${code}`;
+>>>>>>> a9a8fcb (final commit)
     const qrImageData = await QRCode.toDataURL(cardUrl);
 
     const cardTemplatePath = path.join(__dirname, "views", "card.html");

@@ -198,5 +198,35 @@
     "github": "",
     "linkedin": "",
     "code": "SB1"
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+  },
+  "sb20": {
+    "name": "Snehal Bandal",
+    "email": "skbandal02@gmail.com",
+    "phone": "8591142309",
+    "github": "",
+    "linkedin": "",
+    "code": "sb20"
+  },
+  "SB2": {
+    "name": "Snehal Bandal",
+    "email": "skbandal02@gmail.com",
+    "phone": "8591142309",
+    "github": "",
+    "linkedin": "",
+    "code": "SB2"
+  },
+  "SB4": {
+    "name": "Snehal Bandal",
+    "email": "skbandal02@gmail.com",
+    "phone": "8591142309",
+    "github": "",
+    "linkedin": "",
+    "code": "SB4"
+=======
+>>>>>>> 84e680e (final commit)
+>>>>>>> a9a8fcb (final commit)
   }
 }
