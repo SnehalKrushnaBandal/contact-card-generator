@@ -77,7 +77,7 @@ app.get("/card/:code", async (req, res) => {
     }
 
     // to add QR code
-    const cardUrl = `http://localhost:${PORT}/card/${code}`;
+    const cardUrl = `https://contactcard-generator.onrender.com/card/${code}`; 
     const qrImageData = await QRCode.toDataURL(cardUrl);
 
     const cardTemplatePath = path.join(__dirname, "views", "card.html");
@@ -100,7 +100,8 @@ app.get("/card/:code", async (req, res) => {
           ? `<p><strong>LinkedIn:</strong> <a href="${card.linkedin}" target="_blank">${card.linkedin}</a></p>`
           : ""
       )
-        .replace("{{ qrCode }}", `<a href="${qrImageData}" download="${code}-qr.png"><img src="${qrImageData}" class="qr-img" alt="QR Code" /></a>`);
+        .replace("{{ qrImage }}", `<a href="${qrImageData}" download="${code}-qr.png"><img src="${qrImageData}" class="qr-img" id="qr-download-trigger" alt="QR Code" /></a>`);
+
 
 
     res.send(content);
